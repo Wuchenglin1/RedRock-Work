@@ -1,16 +1,27 @@
 package main
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
 	"github.com/gomodule/redigo/redis"
 	"log"
+	"os"
 )
+
+type Config struct {
+	Ip       string `json:"ip"`
+	Password string `json:"password"`
+}
 
 func main() {
 
+	cfg := GetConfig()
+
 	//连接redis
-	dialOption := redis.DialPassword("root")
-	c, err := redis.Dial("tcp", "110.42.165.192:6379", dialOption)
+	fmt.Println(cfg.Ip, cfg.Password)
+	dialOption := redis.DialPassword(cfg.Password)
+	c, err := redis.Dial("tcp", cfg.Ip, dialOption)
 	if err != nil {
 		log.Println("fail:", err)
 		return
@@ -40,4 +51,23 @@ func main() {
 		}
 	}
 
+}
+
+func GetConfig() *Config {
+	var cfg *Config
+	file, err := os.Open("./config.json")
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	defer file.Close()
+
+	reader := bufio.NewReader(file)
+	decoder := json.NewDecoder(reader)
+	err = decoder.Decode(&cfg)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return cfg
 }
