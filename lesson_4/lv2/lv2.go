@@ -30,13 +30,18 @@ func Begin(keyWords string, sType string, page int, limit int) (string, error) {
 	client := &http.Client{}
 	// 格式化参数
 	Limit := strconv.Itoa(limit)
-	//本来这里应该是设置偏移量的，但是感觉好像没啥需要
+	//这里可以简单设置下偏移量，可以达到具体哪一页哪一条数据
+	//但是offset需要啥limit的倍数
 	Offset := strconv.Itoa(page)
-	// 设置body
+	// 拿取数据需要设置body
 	form := url.Values{}
+	//搜索词
 	form.Set("s", keyWords)
+	//搜索类型
 	form.Set("type", sType)
+	//返回的数据条数
 	form.Set("limit", Limit)
+	//偏移量
 	form.Set("offset", Offset)
 	body := strings.NewReader(form.Encode())
 	// 创建请求
@@ -47,13 +52,18 @@ func Begin(keyWords string, sType string, page int, limit int) (string, error) {
 	request.Header.Set("Cookie", "appver=2.0.2")
 	request.Header.Set("Referer", "http://music.163.com")
 	request.Header.Set("Content-Length", strconv.Itoa(body.Len()))
-	// 发起请求
-	response, reqErr := client.Do(request)
-	// 错误处理
-	if reqErr != nil {
-		return "", reqErr
+
+	//发起请求
+	response, err := client.Do(request)
+
+	if err != nil {
+		return "", err
 	}
 	defer response.Body.Close()
-	resBody, _ := ioutil.ReadAll(response.Body)
+	//读取数据，返回
+	resBody, err1 := ioutil.ReadAll(response.Body)
+	if err1 != nil {
+		return "", err1
+	}
 	return string(resBody), nil
 }
