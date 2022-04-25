@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package login;
+
+option go_package = "./login";
+
+message user{
+  string userName =1;
+  string password = 2;
+}
+
+message reqMsg {
+  user user = 1;
+}
+
+message rspMsg{
+  bool OK=1;
+  string message = 2;
+}
+
+service Login{
+  rpc Login(reqMsg) returns (rspMsg){}
+}
