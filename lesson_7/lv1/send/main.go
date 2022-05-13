@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-const account = "amqp://admin:wcl2021214174..@110.42.184.72:5672/"
+const account = "小秘密哦"
 
 func main() {
 	sendMsg()
